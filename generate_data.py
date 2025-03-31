@@ -1,4 +1,4 @@
-# generate_data.py
+
 import numpy as np
 import pandas as pd
 from sklearn.datasets import make_classification
@@ -6,7 +6,7 @@ from sklearn.datasets import make_classification
 def generate_churn_data(n_samples=1000, random_state=42):
     """Generate synthetic customer churn data."""
     
-    # Create binary classification problem
+    
     X, y = make_classification(
         n_samples=n_samples,
         n_features=10,
@@ -15,7 +15,7 @@ def generate_churn_data(n_samples=1000, random_state=42):
         random_state=random_state
     )
     
-    # Create DataFrame with meaningful column names
+    
     df = pd.DataFrame(X, columns=[
         'tenure_months',
         'monthly_charges',
@@ -29,20 +29,20 @@ def generate_churn_data(n_samples=1000, random_state=42):
         'monthly_gb_download'
     ])
     
-    # Scale features to realistic values
+    
     df['tenure_months'] = (df['tenure_months'] * 20 + 30).astype(int)
     df['monthly_charges'] = (df['monthly_charges'] * 50 + 70).round(2)
     df['total_charges'] = (df['total_charges'] * 1000 + 2000).round(2)
     df['monthly_gb_download'] = (df['monthly_gb_download'] * 500 + 200).round(2)
     
-    # Create categorical variables
+    
     df['gender'] = np.random.choice(['Male', 'Female'], size=n_samples)
     df['senior_citizen'] = np.random.choice([0, 1], size=n_samples, p=[0.8, 0.2])
     df['partner'] = np.random.choice(['Yes', 'No'], size=n_samples)
     df['dependents'] = np.random.choice(['Yes', 'No'], size=n_samples)
     df['phone_service'] = np.random.choice(['Yes', 'No'], size=n_samples, p=[0.9, 0.1])
     
-    # Convert scores to categorical
+    
     service_options = ['DSL', 'Fiber optic', 'None']
     df['internet_service'] = pd.qcut(
         df['internet_service_type_score'], 
@@ -71,11 +71,11 @@ def generate_churn_data(n_samples=1000, random_state=42):
         labels=security_options
     )
     
-    # Add churn column (target variable)
+    
     df['churn'] = y
     df['churn'] = df['churn'].map({0: 'No', 1: 'Yes'})
     
-    # Drop original score columns
+    
     df = df.drop([
         'internet_service_type_score',
         'online_security_score',
@@ -85,12 +85,12 @@ def generate_churn_data(n_samples=1000, random_state=42):
         'payment_method_score'
     ], axis=1)
     
-    # Add some missing values
+    
     for col in ['tenure_months', 'monthly_charges', 'online_security', 'payment_method']:
         mask = np.random.choice([True, False], size=n_samples, p=[0.05, 0.95])
         df.loc[mask, col] = np.nan
     
-    # Save the dataset
+    
     df.to_csv('customer_churn_data.csv', index=False)
     print(f"Dataset generated with {n_samples} samples and saved to 'customer_churn_data.csv'")
     
