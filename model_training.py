@@ -200,12 +200,10 @@ def make_predictions(model, X_new, preprocessor=None):
     """Make predictions on new data."""
     
     if preprocessor is not None:
-        # Preprocess the new data using the same transformer
         X_new_processed = preprocessor.transform(X_new)
     else:
         X_new_processed = X_new
     
-    # Make predictions
     predictions = model.predict(X_new_processed)
     
     return predictions
