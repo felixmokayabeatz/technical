@@ -1,4 +1,4 @@
-# model_training.py
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -16,7 +16,7 @@ import joblib
 def train_and_evaluate_models(X, y, feature_names):
     """Train multiple models and evaluate their performance."""
     
-    # Split data into training and testing sets
+    
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
@@ -24,7 +24,7 @@ def train_and_evaluate_models(X, y, feature_names):
     print(f"Training set size: {X_train.shape}")
     print(f"Test set size: {X_test.shape}")
     
-    # Initialize models
+    
     models = {
         "Logistic Regression": LogisticRegression(max_iter=1000, random_state=42),
         "Decision Tree": DecisionTreeClassifier(random_state=42),
@@ -32,16 +32,16 @@ def train_and_evaluate_models(X, y, feature_names):
         "XGBoost": XGBClassifier(random_state=42, use_label_encoder=False, eval_metric='logloss')
     }
     
-    # Train and evaluate each model
+    
     results = {}
     for name, model in models.items():
         print(f"\nTraining {name}...")
         model.fit(X_train, y_train)
         
-        # Make predictions
+        
         y_pred = model.predict(X_test)
         
-        # Calculate metrics
+        
         results[name] = {
             "accuracy": accuracy_score(y_test, y_pred),
             "precision": precision_score(y_test, y_pred),
@@ -49,11 +49,11 @@ def train_and_evaluate_models(X, y, feature_names):
             "f1": f1_score(y_test, y_pred)
         }
         
-        # Print classification report
+        
         print(f"\nClassification Report for {name}:")
         print(classification_report(y_test, y_pred))
         
-        # Plot confusion matrix
+        
         plt.figure(figsize=(8, 6))
         cm = confusion_matrix(y_test, y_pred)
         sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
@@ -63,12 +63,12 @@ def train_and_evaluate_models(X, y, feature_names):
         plt.savefig(f'confusion_matrix_{name.replace(" ", "_").lower()}.png')
         plt.close()
     
-    # Display results comparison
+    
     results_df = pd.DataFrame(results).T
     print("\nModel Comparison:")
     print(results_df)
     
-    # Plot model comparison
+    
     plt.figure(figsize=(12, 6))
     results_df.plot(kind='bar', figsize=(12, 6))
     plt.title('Model Comparison')
@@ -80,33 +80,33 @@ def train_and_evaluate_models(X, y, feature_names):
     plt.savefig('model_comparison.png')
     plt.close()
     
-    # Find the best model based on F1 score
+    
     best_model_name = results_df['f1'].idxmax()
     best_model = models[best_model_name]
     print(f"\nBest model: {best_model_name} with F1 score: {results_df.loc[best_model_name, 'f1']:.4f}")
     
-    # Hyperparameter tuning for the best model
+    
     print(f"\nPerforming hyperparameter tuning for {best_model_name}...")
     best_tuned_model = tune_hyperparameters(best_model_name, best_model, X_train, y_train, X_test, y_test)
     
-    # Feature importance for best model (if applicable)
+    
     if hasattr(best_tuned_model, 'feature_importances_'):
         feature_importance = best_tuned_model.feature_importances_
         
-        # Create DataFrame for feature importance
+        
         importance_df = pd.DataFrame({
             'Feature': feature_names,
             'Importance': feature_importance
         })
         
-        # Sort by importance
+        
         importance_df = importance_df.sort_values('Importance', ascending=False)
         
-        # Display top 10 features
+        
         print("\nTop 10 Important Features:")
         print(importance_df.head(10))
         
-        # Plot feature importance
+        
         plt.figure(figsize=(12, 8))
         sns.barplot(x='Importance', y='Feature', data=importance_df.head(15))
         plt.title(f'Feature Importance - {best_model_name}')
@@ -114,7 +114,7 @@ def train_and_evaluate_models(X, y, feature_names):
         plt.savefig('feature_importance.png')
         plt.close()
     
-    # Save the best model
+    
     joblib.dump(best_tuned_model, 'best_model.pkl')
     print("Best model saved as 'best_model.pkl'")
     
@@ -151,7 +151,7 @@ def tune_hyperparameters(model_name, model, X_train, y_train, X_test, y_test):
             'learning_rate': [0.01, 0.1, 0.2]
         }
     
-    # Create and fit the grid search
+    
     grid_search = GridSearchCV(
         estimator=model,
         param_grid=param_grid,
@@ -162,13 +162,13 @@ def tune_hyperparameters(model_name, model, X_train, y_train, X_test, y_test):
     
     grid_search.fit(X_train, y_train)
     
-    # Get the best parameters and model
+    
     best_params = grid_search.best_params_
     best_model = grid_search.best_estimator_
     
     print(f"Best parameters: {best_params}")
     
-    # Evaluate the tuned model
+    
     y_pred = best_model.predict(X_test)
     
     print("\nTuned Model Performance:")
@@ -177,7 +177,7 @@ def tune_hyperparameters(model_name, model, X_train, y_train, X_test, y_test):
     print(f"Recall: {recall_score(y_test, y_pred):.4f}")
     print(f"F1 Score: {f1_score(y_test, y_pred):.4f}")
     
-    # Plot ROC curve
+    
     y_proba = best_model.predict_proba(X_test)[:, 1]
     fpr, tpr, _ = roc_curve(y_test, y_proba)
     roc_auc = auc(fpr, tpr)
